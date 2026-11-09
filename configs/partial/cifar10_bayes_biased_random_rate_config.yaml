@@ -1,0 +1,64 @@
+# Configuration for CIFAR10 with Bayes-Enforcing Loss and Random Rate Masking
+
+# Dataset configuration
+dataset: "cifar10"
+datadir: "./data/cifar10"
+model_type: "resnet18"
+pretrained: false
+num_classes: 10
+label_names: "cifar10"
+num_labels: 1
+
+# Training configuration
+batch_size: 512
+val_batch_size: 512
+num_workers: 4
+learning_rate: 0.001
+weight_decay: 0.0001
+dropout: 0.3
+max_epochs: 100
+early_stopping_patience: 15
+
+# Loss configuration - Bayes-Enforcing specific
+loss_type: "bayes_enforcing"
+kl_weight: 1.5  # λ in the loss function: L = CE + λ * KL
+num_undersampled_samples: 5  # Number of undersampled samples to average KL over
+warmup_epochs: 5  # Number of epochs to train teacher only before starting KL distillation
+fixed_teacher: True  # Whether to keep teacher model fixed during KL training (recommended)
+
+# Adaptive KL weight configuration
+adaptive_kl_weight: False  # Whether to use adaptive KL weighting based on sampling rate
+kl_weight_min: 0.1  # Minimum KL weight (for low masking rates - focus on CE loss)
+kl_weight_max: 5.0  # Maximum KL weight (for high masking rates - focus on consistency)
+kl_weight_power: 2.0  # Power for adaptive weighting (1.0 = linear, 2.0 = quadratic)
+
+# Logging configuration
+project_name: "neurips26_cifar_bayes"
+run_name: cifar10_bayes_biased_random_rate
+use_wandb: true
+
+# Checkpoint configuration
+checkpoint_dir: "./results/checkpoints/cifar10/bayes_biased_random_rate/"
+
+# Input type configuration
+input_type: "image"
+kspace_shape: [32, 32]
+mask_type: biased_random_rate_patch
+bias_threshold: 0.5
+bias_low_rate_weight: 0.7
+min_sampling_rate: 0.01  # Minimum k_fraction
+max_sampling_rate: 1.0  # Maximum k_fraction
+in_channels: 3
+patch_mask_ratio: "biased_random"
+patch_mask_ratio: "random"
+bias_threshold: 0.5
+bias_low_rate_weight: 0.7
+patch_size: 4
+
+
+# Multi-masking configuration (not used for Bayes-enforcing during training)
+num_masks_train: 1
+num_masks_val: 1
+num_masks_test: 1
+
+val_sampling_ratio: 0.25

@@ -1,0 +1,16 @@
+torch
+torchvision
+lightning
+numpy
+scipy
+matplotlib
+pandas
+pyyaml
+scikit-learn
+h5py
+joblib
+tqdm
+wandb
+torchmetrics
+click
+Pillow

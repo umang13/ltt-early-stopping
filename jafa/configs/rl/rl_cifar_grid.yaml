@@ -1,0 +1,40 @@
+name: rl_cifar_frozen_fixedsplit_top8
+entrypoint: rl/main.py
+
+common:
+  data_type: cifar_test_1
+  clf_hidden_sizes: [256, 128]
+  policy_hidden_sizes: [256, 128, 128]
+  shared_dim: 128
+  save_dir: results/train_rl_cifar_grid_fixed_split_top8
+  resnet_encoder_type: ResnetEncoderFree
+  target_update_type: correct
+  pretrain: 25000
+  pretrain_eval_freq: 500
+  pretrain_selection_count: 20
+  total_steps: 5000000
+  eval_freq: 100
+  checkpoint_budgets: "12,16"
+  freeze_after_pretrain: true
+  wandb_project: rl-cifar-feature-selection
+  wandb_mode: online
+  message: _frozen_qonly_fixedsplit_top8
+  random_seed: 123
+
+runs:
+  - r_cost: -0.025
+    initial_visible_count: 1
+  - r_cost: -0.025
+    initial_visible_count: 2
+  - r_cost: -0.025
+    initial_visible_count: 4
+  - r_cost: -0.025
+    initial_visible_count: 8
+  - r_cost: -0.05
+    initial_visible_count: 1
+  - r_cost: -0.05
+    initial_visible_count: 2
+  - r_cost: -0.05
+    initial_visible_count: 4
+  - r_cost: -0.075
+    initial_visible_count: 1

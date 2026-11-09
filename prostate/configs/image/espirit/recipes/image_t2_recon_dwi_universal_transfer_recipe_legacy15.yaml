@@ -1,0 +1,60 @@
+# ESPIRiT recipe-mode legacy-15 fusion transfer run using the fixed best hyperparameters across 3 seeds.
+# Run with: uv run python -m scripts.grid_train --config configs/image/espirit/recipes/image_t2_recon_dwi_universal_transfer_recipe_legacy15.yaml
+experiments:
+  - name: image_t2_recon_dwi_universal_transfer_espirit_recipe_legacy15_adc_b1500_mtl_consecutive_aligned_seed3
+    mode: image
+    base_args:
+      h5_root: /gpfs/scratch/td2105/dwi_stream/recons_espirit_state_bank_v2
+      dicom_h5_roots:
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_20240212
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_2024_data_20250408
+      labels_csv: /gpfs/data/prostatelab/processed_data/csv/prostate_mri_radiology_reports_201212_202508.csv
+      pathology_csv: /gpfs/data/prostatelab/processed_data/csv/MRI_with_followup_biopsy_0to180d_and_psa_density.csv
+      image_source: hybrid
+      image_metrics: adc_b1500
+      model_variant: t2_recon_dwi_fusion
+      coil_combine: espirit
+      recipe_mode: legacy_tags
+      cohort: aligned
+      validation_policy: aligned_holdout
+      split_strategy: consecutive_patient_holdout
+      split_test_frac: 0.10
+      split_pool_train_frac: 0.85
+      enable_gleason_task: true
+      gleason_positive_grade_group_threshold: 2
+      primary_metric: gleason_auroc
+      output_dir: outputs/image_t2_recon_dwi_universal_transfer_espirit_recipes_legacy15/adc_b1500_mtl_consecutive_aligned_seed3
+      device: cuda
+      epochs: 60
+      batch_size: 8
+      log_interval: 100
+      eval_interval_steps: 1000
+      lr_scheduler: cosine
+      lr_warmup_epochs: 2
+      grad_accum_steps: 2
+      early_stopping_patience: 10
+      num_workers: 4
+      date_buffer_days: 7
+      wandb_project: prostate-kspace-classifier
+      wandb_mode: online
+      amp_dtype: none
+      backbone_pretrained: false
+      freeze_backbone: false
+      augment: true
+      dropout: 0.3
+      label_smoothing: 0.0
+      backbone: r3d_18
+      pirads_loss_weight: 1.0
+      gleason_loss_weight: 0.5
+      wandb_group: imaget2recondwi_transfer_espirit_recipe_legacy15_bestcfg_seed3
+    variants:
+      - label: both_init
+        base_args:
+          dwi_branch_init_from_checkpoint: outputs/image_recon_universal_source_espirit_recipes_legacy15/adc_b1500_mtl_consecutive_source_internal/best_recon-image-recon_only-consecutive_patient_holdout-mtl-espirit-legacy15-adc_b1500-single_stream-r3d_18-scratch-lr3e-05-wd1e-02-bs8-seed5555-initdicom_encoder_only_fz0.pt
+          t2_branch_init_from_checkpoint: outputs/image_t2_source/mtl_consecutive_source_internal/best_dicom-image-dicom_only-consecutive_patient_holdout-mtl-axt2-single_stream-r3d_18-scratch-lr1e-05-wd3e-02-bs8-seed5555-noinit.pt
+          freeze_initialized_branch_epochs: 0
+          fusion_gate: false
+        grid_params:
+          lr: [2e-05]
+          weight_decay: [3e-02]
+          seed: [5555, 6666, 7777]

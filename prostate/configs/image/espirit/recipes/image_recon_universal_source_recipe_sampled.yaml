@@ -1,0 +1,64 @@
+# ESPIRiT recipe-mode recon source checkpoint for sampled one-, two-, and three-direction recipes.
+# Run with: uv run python -m scripts.grid_train --config configs/image/espirit/recipes/image_recon_universal_source_recipe_sampled.yaml
+experiments:
+  - name: image_recon_universal_source_espirit_recipe_sampled_adc_b1500_mtl_consecutive_source_internal
+    mode: image
+    base_args:
+      h5_root: /gpfs/scratch/td2105/dwi_stream/recons_espirit_state_bank_v2
+      dicom_h5_roots:
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_20240212
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_2024_data_20250408
+      labels_csv: /gpfs/data/prostatelab/processed_data/csv/prostate_mri_radiology_reports_201212_202508.csv
+      pathology_csv: /gpfs/data/prostatelab/processed_data/csv/MRI_with_followup_biopsy_0to180d_and_psa_density.csv
+      image_source: recon
+      image_metrics: adc_b1500
+      model_variant: single_stream
+      coil_combine: espirit
+      recipe_mode: sampled_recipes
+      recipes_per_accession: 24
+      recipe_family_quotas:
+        - single_dir=4
+        - dual_dir=8
+        - legacy_anchor=4
+        - xyz_equal=4
+        - xyz_asymmetric=4
+      recipe_seed: 1337
+      cohort: recon_only
+      validation_policy: source_internal
+      split_strategy: consecutive_patient_holdout
+      split_test_frac: 0.10
+      split_pool_train_frac: 0.85
+      enable_gleason_task: true
+      gleason_positive_grade_group_threshold: 2
+      primary_metric: gleason_auroc
+      output_dir: outputs/image_recon_universal_source_espirit_recipes_sampled24/adc_b1500_mtl_consecutive_source_internal
+      device: cuda
+      epochs: 60
+      batch_size: 8
+      log_interval: 100
+      eval_interval_steps: 1000
+      lr_scheduler: cosine
+      lr_warmup_epochs: 2
+      grad_accum_steps: 2
+      early_stopping_patience: 10
+      num_workers: 4
+      date_buffer_days: 7
+      wandb_project: prostate-kspace-classifier
+      wandb_mode: online
+      amp_dtype: none
+      backbone_pretrained: false
+      freeze_backbone: false
+      augment: true
+      dropout: 0.3
+      label_smoothing: 0.0
+      backbone: r3d_18
+      init_from_checkpoint: outputs/image_dicom/mtl_consecutive_aligned/best_dicom-image-aligned-consecutive_patient_holdout-mtl-adc_b1500-stack-r3d_18-scratch-lr3e-05-bs8-seed9997.pt
+      init_scope: encoder_only
+      init_freeze_backbone_epochs: 0
+    grid_params:
+      pirads_loss_weight: [1.0]
+      gleason_loss_weight: [0.5]
+      lr: [3e-05]
+      weight_decay: [1e-02]
+      seed: [5555]
+      wandb_group: [imgrecon_universal_source_espirit_recipe_sampled24]

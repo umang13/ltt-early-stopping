@@ -1,0 +1,73 @@
+project_name: icml26_knee_slice_distill
+seed: 0 
+ckpt_dir: ./checkpoints
+
+# data 
+datadir: /gpfs/data/chopra_public/fastmri_knee_dataset/single_coil/processed_data/knee
+dataset: knee
+# split_csv_file: /gpfs/data/chopralab/fastmri_knee_dataset/single_coil/processed_data/knee/meta_data_max.csv
+split_csv_file: /gpfs/data/chopra_public/fastmri_knee_dataset/single_coil/processed_data/knee/meta_data_max_new.csv
+coil_type: sc
+classifier_type: bayes_distill_arms
+multilabel : True
+
+# weighted random sampler
+use_weighted_sampler: False
+train_sampler_filename: None #/gpfs/data/chopralab/fastmri_knee_dataset/samplers/single_coil/arms_sampler_knee_tr.p
+
+# task
+task: classification
+combine_class_recon_splits: True
+ignore_kspace: False
+ignore_image: True
+
+# classification 
+num_labels: 3
+num_classes: 2
+label_names: acl,mtear,abnormal
+loss_type: weighted_cross_entropy
+loss_fn_weights_filename : /gpfs/data/chopra_public/fastmri_knee_dataset/samplers/single_coil/loss_fn_weights_knee_tr.p
+
+# knee data stats
+image_shape: [320, 320]
+kspace_shape: [640, 400]
+sampled_indices: [33, 367]
+in_channels: 1
+
+# backbone model
+model_type: 'resnet18'
+pretrained: imagenet
+dropout: 0.2
+# optimization
+n_epochs: 200
+num_workers: 3
+optimizer: adamw
+grad_clip_val: 0.0
+batch_size: 16
+val_batch_size: 16
+test_batch_size: 16
+accumulate_grad_batches: 1
+lr: 0.0005
+weight_decay: 0.00001
+lr_step_size: 3
+lr_gamma: 0.1
+lr_scheduler: True
+early_stopping_patience: 15
+
+# masking strategy
+k_fraction: 0.1 # ignored when greedy_search is True
+center_fraction: 0.05 # ignored when greedy_search is True
+mask_type: random_vds
+val_fn_type: MI
+greedy_search: True
+warmup_epochs: 5
+
+
+early_stopping_greedy: True
+use_fixed_mask_for_val : False
+val_shuffle : False
+
+# checkpoint
+resume_train: False
+ckpt_path: None
+val_sampling_ratio: 0.1

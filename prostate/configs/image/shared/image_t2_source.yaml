@@ -1,0 +1,52 @@
+# T2 source checkpoint for fusion transfer, trained on a source-only split.
+# Run with: uv run python -m scripts.grid_train --config configs/image/shared/image_t2_source.yaml
+experiments:
+  - name: image_t2_source_mtl_consecutive_source_internal
+    mode: image
+    base_args:
+      h5_root: /gpfs/scratch/td2105/dwi_stream/recons_rss_espirit
+      dicom_h5_roots:
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_20240212
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_2024_data_20250408
+      labels_csv: /gpfs/data/prostatelab/processed_data/csv/prostate_mri_radiology_reports_201212_202508.csv
+      pathology_csv: /gpfs/data/prostatelab/processed_data/csv/MRI_with_followup_biopsy_0to180d_and_psa_density.csv
+      image_source: dicom
+      image_metrics: axt2
+      model_variant: single_stream
+      coil_combine: rss
+      cohort: dicom_only
+      validation_policy: source_internal
+      split_strategy: consecutive_patient_holdout
+      split_test_frac: 0.10
+      split_pool_train_frac: 0.85
+      enable_gleason_task: true
+      gleason_positive_grade_group_threshold: 2
+      primary_metric: gleason_auroc
+      output_dir: outputs/image_t2_source/mtl_consecutive_source_internal
+      device: cuda
+      epochs: 60
+      batch_size: 8
+      log_interval: 100
+      eval_interval_steps: 1000
+      lr_scheduler: cosine
+      lr_warmup_epochs: 2
+      grad_accum_steps: 2
+      early_stopping_patience: 10
+      num_workers: 4
+      date_buffer_days: 7
+      wandb_project: prostate-kspace-classifier
+      wandb_mode: online
+      amp_dtype: none
+      backbone_pretrained: false
+      freeze_backbone: false
+      augment: true
+      dropout: 0.3
+      label_smoothing: 0.0
+      backbone: r3d_18
+    grid_params:
+      pirads_loss_weight: [1.0]
+      gleason_loss_weight: [0.5]
+      lr: [1e-05]
+      weight_decay: [3e-02]
+      seed: [5555]
+      wandb_group: [imaget2_source_transfer]

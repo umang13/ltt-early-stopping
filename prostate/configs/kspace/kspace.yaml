@@ -1,0 +1,38 @@
+# K-space classifier using post-GRAPPA k-space with FFTConv layers
+# Run with: uv run python -m scripts.grid_train --config configs/kspace/kspace.yaml
+experiments:
+  - name: kspace_sweep
+    mode: kspace
+    base_args:
+      h5_root: /gpfs/scratch/td2105/dwi_stream/recons_rss_espirit
+      labels_csv: /gpfs/data/prostatelab/processed_data/csv/prostate_mri_radiology_reports_201212_202508.csv
+      pathology_csv: /gpfs/data/prostatelab/processed_data/csv/MRI_with_followup_biopsy_0to180d_and_psa_density.csv
+      cohort: recon_only
+      enable_gleason_task: true
+      gleason_positive_grade_group_threshold: 2
+      pirads_loss_weight: 1.0
+      gleason_loss_weight: 1.0
+      primary_metric: gleason_auroc
+      output_dir: outputs/kspace
+      device: cuda
+      epochs: 30
+      batch_size: 2
+      log_interval: 50
+      eval_interval_steps: 400
+      lr_scheduler: cosine
+      lr_warmup_epochs: 2
+      grad_accum_steps: 2
+      early_stopping_patience: 8
+      seed: 1337
+      num_workers: 4
+      date_buffer_days: 7
+      wandb_project: prostate-kspace-classifier
+      wandb_mode: online
+      wandb_group: kspace_sweep_v1
+      filter_mode: single_channel
+      backbone: r3d_18
+      backbone_pretrained: false
+    grid_params:
+      num_kspace_filters: [1]
+      lr: [2e-04]
+      weight_decay: [0.01]

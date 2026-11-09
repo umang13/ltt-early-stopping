@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.venv/
+venv/
+data/
+results/
+outputs/
+checkpoints/
+logs/
+wandb/
+*.ckpt
+*.pt
+*.npz
+*.h5

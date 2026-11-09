@@ -1,0 +1,55 @@
+# Image classifier using recon image metrics with DICOM-initialized transfer sweeps.
+# Run with: uv run python -m scripts.grid_train --config configs/image/rss/image_recon.yaml
+experiments:
+  - name: image_recon_transfer_adc_b1500_mtl_consecutive_aligned_lrwd_init_grid
+    mode: image
+    base_args:
+      h5_root: /gpfs/scratch/td2105/dwi_stream/recons_rss_espirit
+      dicom_h5_roots:
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_20240212
+        - /gpfs/data/prostatelab/processed_data/h5/t2_dwi_filtered_2024_data_20250408
+      labels_csv: /gpfs/data/prostatelab/processed_data/csv/prostate_mri_radiology_reports_201212_202508.csv
+      pathology_csv: /gpfs/data/prostatelab/processed_data/csv/MRI_with_followup_biopsy_0to180d_and_psa_density.csv
+      image_source: recon
+      image_metrics: adc_b1500
+      coil_combine: rss
+      cohort: aligned
+      split_strategy: consecutive_patient_holdout
+      split_test_frac: 0.10
+      split_pool_train_frac: 0.85
+      enable_gleason_task: true
+      gleason_positive_grade_group_threshold: 2
+      primary_metric: gleason_auroc
+      output_dir: outputs/image_recon/adc_b1500_mtl_consecutive_aligned_transfer_lrwd_init_grid
+      device: cuda
+      epochs: 200
+      batch_size: 8
+      log_interval: 100
+      eval_interval_steps: 1000
+      lr_scheduler: cosine
+      lr_warmup_epochs: 2
+      grad_accum_steps: 2
+      early_stopping_patience: 30
+      num_workers: 4
+      date_buffer_days: 7
+      wandb_project: prostate-kspace-classifier
+      wandb_mode: online
+      amp_dtype: none
+      model_variant: single_stream
+      backbone_pretrained: false
+      freeze_backbone: false
+      augment: true
+      dropout: 0.3
+      label_smoothing: 0.0
+      backbone: r3d_18
+      init_from_checkpoint: outputs/image_dicom/mtl_consecutive_aligned/best_dicom-image-aligned-consecutive_patient_holdout-mtl-adc_b1500-stack-r3d_18-scratch-lr3e-05-bs8-seed9997.pt
+    grid_params:
+      averaging_tag: [b50_1_b1000_1, b50_1_b1000_2, b50_1_b1000_3, b50_2_b1000_6, b50_4_b1000_12]
+      pirads_loss_weight: [1.0]
+      gleason_loss_weight: [0.5]
+      lr: [2e-05]
+      weight_decay: [1e-02]
+      init_scope: [full]
+      init_freeze_backbone_epochs: [5]
+      seed: [5555, 6666, 7777]
+      wandb_group: [imgrecon_transfer_split_consecutive_patient_holdout_aligned_lr2e-05_wd1e-02_initfull_freeze5_seed3_allavg_initaligneddicom]

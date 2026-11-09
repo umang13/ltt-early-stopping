@@ -1,0 +1,39 @@
+[project]
+name = "prostate-kspace-classifier"
+version = "0.1.0"
+description = "MRI prostate cancer classification experiments comparing image-domain and k-space-domain models."
+authors = [
+    {name = "cai2r"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib",
+    "torch",
+    "torchvision",
+    "numpy",
+    "pandas",
+    "h5py",
+    "scikit-learn",
+    "tqdm",
+    "pyyaml",
+    "wandb",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "ruff",
+    "jupyterlab",
+    "ipykernel",
+]
+
+[tool.uv]
+managed = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
