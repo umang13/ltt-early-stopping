@@ -4,7 +4,8 @@ __pycache__/
 .DS_Store
 .venv/
 venv/
-data/
+/data/
+jafa/data/
 results/
 outputs/
 checkpoints/
